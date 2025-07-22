@@ -1,0 +1,159 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// 用户表 - 支持客户、技师、管理员三种角色
+model User {
+  id          Int      @id @default(autoincrement())
+  phone       String   @unique
+  passwordHash String
+  role        String   // CUSTOMER, TECHNICIAN, ADMIN
+  nickname    String?
+  avatarUrl   String?
+  inviteCode  String   @unique
+  invitedBy   Int?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 邀请关系
+  inviter     User?    @relation("UserInvites", fields: [invitedBy], references: [id])
+  invitees    User[]   @relation("UserInvites")
+
+  // 技师相关信息
+  technicianProfile TechnicianProfile?
+
+  // 订单关系
+  customerOrders    Order[] @relation("CustomerOrders")
+  technicianOrders  Order[] @relation("TechnicianOrders")
+  
+  // 分佣记录
+  commissions       Commission[]
+
+  @@map("users")
+}
+
+// 技师详细信息表
+model TechnicianProfile {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @unique
+  realName    String
+  gender      String?  // 性别字段
+  age         Int
+  height      String?
+  weight      String?
+  experience  String?
+  services    String   // JSON字符串存储服务类型
+  photos      String   // JSON字符串存储照片URLs
+  city        String
+  district    String?
+  isVerified  Boolean  @default(false)
+  isAvailable Boolean  @default(true)
+  rating      Float    @default(5.0)
+  orderCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 关联用户
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("technician_profiles")
+}
+
+// 订单表
+model Order {
+  id              Int         @id @default(autoincrement())
+  orderNumber     String      @unique
+  customerId      Int
+  technicianId    Int?
+  serviceType     String
+  serviceDuration Int         // 服务时长（分钟）
+  totalAmount     Float       // 总金额
+  depositAmount   Float       // 定金金额（50%）
+  finalAmount     Float       // 尾款金额（50%）
+  status          String      @default("PENDING") // PENDING, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED
+  serviceAddress  String
+  contactInfo     String      // 加密存储的联系方式
+  scheduledTime   DateTime
+  completedAt     DateTime?
+  cancelReason    String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // 关联用户
+  customer        User        @relation("CustomerOrders", fields: [customerId], references: [id])
+  technician      User?       @relation("TechnicianOrders", fields: [technicianId], references: [id])
+  
+  // 支付记录
+  payments        Payment[]
+  
+  // 分佣记录
+  commissions     Commission[]
+
+  @@map("orders")
+}
+
+// 支付记录表
+model Payment {
+  id            Int           @id @default(autoincrement())
+  orderId       Int
+  amount        Float
+  type          String        // DEPOSIT, FINAL
+  status        String        @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
+  paymentMethod String        // 支付方式
+  transactionId String?       // 第三方交易ID
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+
+  // 关联订单
+  order         Order         @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}
+
+// 分佣记录表
+model Commission {
+  id          Int             @id @default(autoincrement())
+  userId      Int
+  orderId     Int
+  amount      Float
+  percentage  Float           // 分佣比例
+  type        String           // CUSTOMER_INVITE, TECHNICIAN_INVITE, AGENT_COMMISSION
+  status      String           @default("PENDING") // PENDING, PAID, CANCELLED
+  level       Int             // 邀请层级
+  paidAt      DateTime?
+  createdAt   DateTime        @default(now())
+
+  // 关联
+  user        User            @relation(fields: [userId], references: [id])
+  order       Order           @relation(fields: [orderId], references: [id])
+
+  @@map("commissions")
+}
+
+// 城市表
+model City {
+  id        Int      @id @default(autoincrement())
+  name      String
+  province  String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("cities")
+}
+
+// SQLite不支持枚举，使用字符串常量
+// UserRole: CUSTOMER, TECHNICIAN, ADMIN
+// OrderStatus: PENDING, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED
+// PaymentType: DEPOSIT, FINAL
+// PaymentStatus: PENDING, PAID, FAILED, REFUNDED
+// CommissionType: CUSTOMER_INVITE, TECHNICIAN_INVITE, AGENT_COMMISSION
+// CommissionStatus: PENDING, PAID, CANCELLED
