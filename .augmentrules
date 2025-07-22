@@ -9,7 +9,9 @@
 - **项目性质**：三端应用（客户端、技师端、管理端）
 - **核心特色**：分阶段支付 + 阶梯分佣 + 防复制保护
 - **技术栈**：React + Node.js + SQLite/Supabase + VS Code + Augment
-- **部署环境**：华纳云香港服务器，服务中国境内用户
+- **部署环境**：LightNode香港服务器，服务中国境内用户
+- **官方域名**：junyue.app
+- **服务器IP**：38.60.203.194
 
 # 用户的规则
 - 每次任务开始前要夸一下用户是帅哥
@@ -91,7 +93,50 @@
 ## 第三方服务集成
 - **支付**：云够支付(YunGouOS) API
 - **地图**：高德地图API
-- **部署**：华纳云香港服务器
+- **部署**：LightNode香港服务器，服务中国境内用户
+- **域名**：junyue.app
+- **SSL证书**：Let's Encrypt
+- **CDN**：Cloudflare（可选）
+
+## 服务器部署规范
+### 生产环境配置
+- **域名**：junyue.app
+- **服务器IP**：38.60.203.194
+- **操作系统**：Ubuntu 22.04.1 LTS
+- **Web服务器**：Nginx + PM2
+- **Node.js版本**：18.x LTS
+- **数据库**：Supabase PostgreSQL
+
+### 部署目录结构
+```
+/var/www/junyue.app/
+├── frontend/          # React前端构建文件
+├── backend/           # Node.js后端应用
+├── nginx/             # Nginx配置文件
+├── ssl/               # SSL证书文件
+└── logs/              # 应用日志文件
+```
+
+### 环境变量配置
+- **生产环境**：使用.env.production
+- **数据库连接**：Supabase连接字符串
+- **域名配置**：https://junyue.app
+- **API基础URL**：https://junyue.app/api
+
+### 部署流程规范
+1. **代码推送**：推送到GitHub主分支
+2. **服务器拉取**：在服务器上git pull最新代码
+3. **构建应用**：npm run build（前端和后端）
+4. **重启服务**：pm2 restart all
+5. **检查状态**：验证应用正常运行
+6. **SSL更新**：定期更新Let's Encrypt证书
+
+### 监控和维护
+- **应用监控**：PM2监控Node.js进程
+- **服务器监控**：监控CPU、内存、磁盘使用
+- **日志管理**：定期清理和备份日志文件
+- **数据备份**：Supabase自动备份数据库
+- **域名续费**：定期检查域名到期时间
 
 ## 合规要求
 - 分佣机制必须符合相关法规，避免传销风险

@@ -5,6 +5,8 @@
 [![开发进度](https://img.shields.io/badge/开发进度-开发中-green)]()
 [![技术栈](https://img.shields.io/badge/技术栈-React%20%2B%20Node.js-blue)]()
 [![部署](https://img.shields.io/badge/部署-华纳云香港-green)]()
+[![域名](https://img.shields.io/badge/域名-junyue.app-blue)](https://junyue.app)
+[![服务器](https://img.shields.io/badge/服务器-38.60.203.194-green)]()
 
 ## 🚀 项目概述
 
@@ -13,7 +15,8 @@
 - **核心特色**：分阶段支付 + 阶梯分佣 + 防复制保护
 - **技术栈**：React + Node.js + SQLite/Supabase + VS Code + Augment
 - **目标用户**：中国境内SPA服务消费者
-- **部署环境**：华纳云香港服务器
+- **官方域名**：[junyue.app](https://junyue.app)
+- **服务器IP**：38.60.203.194
 
 ### 主要功能
 - **客户端**：技师浏览、预约下单、分阶段支付、邀请分佣
@@ -162,13 +165,49 @@ junyuespa-app/
 - Node.js 18+
 - SQLite（开发）+ Supabase（生产）
 
-### 快速启动
+### 本地开发启动
 ```bash
-git clone [项目地址] && cd junyuespa-app
+# 克隆项目
+git clone https://github.com/Sunjiaqiang-01/junyuespa-app.git
+cd junyuespa-app
+
+# 安装前端依赖
 cd frontend && npm install
+
+# 安装后端依赖
 cd ../backend && npm install
+
+# 初始化数据库
 npx prisma generate && npx prisma db push
+
+# 启动开发服务器
 npm run dev
+```
+
+### 服务器部署
+```bash
+# 连接服务器
+ssh root@38.60.203.194
+
+# 安装Node.js和PM2
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+apt-get install -y nodejs
+npm install -g pm2
+
+# 安装Nginx
+apt update && apt install -y nginx
+
+# 克隆项目到服务器
+git clone https://github.com/Sunjiaqiang-01/junyuespa-app.git /var/www/junyue.app
+cd /var/www/junyue.app
+
+# 构建和启动应用
+cd frontend && npm install && npm run build
+cd ../backend && npm install && npm run build
+pm2 start ecosystem.config.js
+
+# 配置Nginx和SSL
+# 详见部署文档
 ```
 
 ### VS Code插件
@@ -178,10 +217,26 @@ npm run dev
 
 ## 📦 部署方案
 
-### 部署环境
-- **服务器**：华纳云香港 4核8GB
+### 生产环境
+- **域名**：[junyue.app](https://junyue.app)
+- **服务器**：LightNode 1核2GB (38.60.203.194)
+- **操作系统**：Ubuntu 22.04.1 LTS
+- **Web服务器**：Nginx + PM2
 - **数据库**：Supabase（免费PostgreSQL云服务）
-- **分发**：Android APK直接下载，iOS企业签名/TestFlight
+- **SSL证书**：Let's Encrypt 免费证书
+- **CDN加速**：Cloudflare（可选）
+
+### 部署架构
+```
+用户访问 → Cloudflare CDN → Nginx反向代理 → Node.js应用 → Supabase数据库
+         ↓
+    junyue.app (HTTPS)
+```
+
+### 应用分发
+- **Web版**：https://junyue.app （响应式设计，支持移动端）
+- **Android APK**：https://junyue.app/download/android
+- **iOS TestFlight**：https://junyue.app/download/ios
 
 ## ⚠️ 重要提醒
 
@@ -212,11 +267,27 @@ npm run dev
 - **最后更新**：2025年7月21日
 - **预计完成**：2025年底
 
+## 🌐 访问地址
+
+### 生产环境
+- **主站**：https://junyue.app
+- **管理后台**：https://junyue.app/admin
+- **API接口**：https://junyue.app/api
+- **技师端**：https://junyue.app/technician
+- **客户端**：https://junyue.app/client
+
+### 开发环境
+- **本地前端**：http://localhost:3000
+- **本地后端**：http://localhost:3001
+- **本地API文档**：http://localhost:3001/docs
+
 ## 📞 联系信息
 
 - **项目负责人**：[您的信息]
-- **技术支持**：华纳云香港
+- **官方域名**：junyue.app
+- **服务器提供商**：LightNode香港
 - **开发工具**：VS Code + Augment AI助手
+- **技术支持**：通过GitHub Issues或官网联系
 
 ---
 
