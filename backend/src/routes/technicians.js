@@ -2,6 +2,7 @@ import express from 'express';
 import { body, query, validationResult } from 'express-validator';
 import { PrismaClient } from '@prisma/client';
 import { authMiddleware } from '../middleware/auth.js';
+import { encryptContactInfo, decryptContactInfo, maskContactInfo } from '../utils/encryption.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();

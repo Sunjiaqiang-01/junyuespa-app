@@ -1,0 +1,39 @@
+{
+  "name": "junyuespa-app",
+  "version": "1.0.0",
+  "description": "君悦彩虹SPA移动应用",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build": "npm run build:frontend && npm run build:mobile",
+    "build:frontend": "cd frontend && npm run build",
+    "build:mobile": "npx cap sync",
+    "build:android": "npm run build:frontend && npx cap sync android && npx cap build android",
+    "build:ios": "npm run build:frontend && npx cap sync ios && npx cap build ios",
+    "open:android": "npx cap open android",
+    "open:ios": "npx cap open ios",
+    "sync": "npx cap sync",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "spa",
+    "mobile",
+    "capacitor",
+    "react",
+    "nodejs"
+  ],
+  "author": "君悦彩虹SPA团队",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/android": "^7.4.2",
+    "@capacitor/cli": "^7.4.2",
+    "@capacitor/core": "^7.4.2",
+    "@capacitor/ios": "^7.4.2"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.8.3"
+  }
+}

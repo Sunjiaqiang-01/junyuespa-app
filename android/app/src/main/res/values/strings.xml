@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">君悦彩虹SPA</string>
+    <string name="title_activity_main">君悦彩虹SPA</string>
+    <string name="package_name">com.junyue.spa</string>
+    <string name="custom_url_scheme">com.junyue.spa</string>
+</resources>

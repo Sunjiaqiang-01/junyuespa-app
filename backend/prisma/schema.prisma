@@ -38,6 +38,10 @@ model User {
   // 分佣记录
   commissions       Commission[]
 
+  // 管理员联系记录
+  adminContacts     AdminContact[] @relation("AdminContacts")
+  technicianContacts AdminContact[] @relation("TechnicianContacts")
+
   @@map("users")
 }
 
@@ -148,6 +152,25 @@ model City {
   createdAt DateTime @default(now())
 
   @@map("cities")
+}
+
+// 管理员联系记录表
+model AdminContact {
+  id            Int      @id @default(autoincrement())
+  adminId       Int
+  technicianId  Int
+  message       String
+  contactMethod String   // phone, sms, app
+  urgent        Boolean  @default(false)
+  status        String   @default("SENT") // SENT, READ, REPLIED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 关联
+  admin         User     @relation("AdminContacts", fields: [adminId], references: [id])
+  technician    User     @relation("TechnicianContacts", fields: [technicianId], references: [id])
+
+  @@map("admin_contacts")
 }
 
 // SQLite不支持枚举，使用字符串常量

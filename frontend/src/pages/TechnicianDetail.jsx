@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { 
-  NavBar, 
-  Card, 
-  Button, 
-  Tag, 
-  Toast, 
-  Swiper, 
+import {
+  NavBar,
+  Card,
+  Button,
+  Tag,
+  Toast,
+  Swiper,
   Space,
   Divider,
   Grid
 } from 'antd-mobile'
-import { 
-  LeftOutline, 
-  StarFill, 
+import {
+  LeftOutline,
+  StarFill,
   EnvironmentOutline,
   PhoneFill,
   ClockCircleOutline,
   UserOutline
 } from 'antd-mobile-icons'
 import axios from 'axios'
+import { enableAntiCopyProtection, disableAntiCopyProtection } from '../utils/antiCopy'
 
 const TechnicianDetail = () => {
   const { id } = useParams()
@@ -30,6 +31,21 @@ const TechnicianDetail = () => {
   // 加载技师详情
   useEffect(() => {
     loadTechnicianDetail()
+
+    // 启用防复制保护
+    enableAntiCopyProtection({
+      disableRightClick: true,
+      disableSelection: true,
+      disableShortcuts: true,
+      disableLongPress: true,
+      protectImages: true,
+      detectScreenshot: true
+    })
+
+    // 组件卸载时清理
+    return () => {
+      disableAntiCopyProtection()
+    }
   }, [id])
 
   const loadTechnicianDetail = async () => {
@@ -102,7 +118,7 @@ const TechnicianDetail = () => {
   }
 
   return (
-    <div style={{ paddingBottom: '80px' }}>
+    <div className="no-select" style={{ paddingBottom: '80px' }}>
       {/* 导航栏 */}
       <NavBar
         back="返回"

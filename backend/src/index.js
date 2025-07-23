@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+import xss from 'xss';
 
 // 导入路由
 import authRoutes from './routes/auth.js';
@@ -11,6 +12,16 @@ import userRoutes from './routes/users.js';
 import technicianRoutes from './routes/technicians.js';
 import orderRoutes from './routes/orders.js';
 import paymentRoutes from './routes/payments.js';
+import adminRoutes from './routes/admin.js';
+
+// 导入安全中间件
+import {
+  xssProtection,
+  csrfProtection,
+  inputValidation,
+  sqlInjectionProtection,
+  securityHeaders
+} from './middleware/security.js';
 
 // 加载环境变量
 dotenv.config();
@@ -24,10 +35,27 @@ const PORT = process.env.PORT || 3000;
 
 // 安全中间件
 app.use(helmet());
+app.use(securityHeaders);
 
 // CORS配置
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'https://junyue.app',
+  'https://www.junyue.app',
+  'http://localhost:5173'
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // 允许没有origin的请求（如移动应用）
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('不被CORS策略允许'));
+    }
+  },
   credentials: true
 }));
 
@@ -42,6 +70,12 @@ app.use(limiter);
 // 解析JSON
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// 应用安全中间件
+app.use(inputValidation);
+app.use(xssProtection);
+app.use(sqlInjectionProtection);
+app.use(csrfProtection);
 
 // 健康检查接口
 app.get('/health', (req, res) => {
@@ -62,7 +96,8 @@ app.get('/api', (req, res) => {
       users: '/api/users',
       technicians: '/api/technicians',
       orders: '/api/orders',
-      payments: '/api/payments'
+      payments: '/api/payments',
+      admin: '/api/admin'
     }
   });
 });
@@ -73,6 +108,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/technicians', technicianRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 错误处理中间件
 app.use((err, req, res, next) => {
